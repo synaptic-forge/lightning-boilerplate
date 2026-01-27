@@ -6,3 +6,6 @@ data/
 .cometml-runs/
 powermetrics_log.txt
 logs/
+.venv
+.python-version
+.pytest_cache
