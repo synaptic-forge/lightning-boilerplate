@@ -96,6 +96,14 @@ self.tracker = EmissionsTracker(
 > You can customize this behavior by creating a `.codecarbon.config` file in the project's root directory. See the [CodeCarbon documentation](https://mlco2.github.io/codecarbon/usage.html#configuration) for details.
 
 
+## Tests
+
+To run tests : 
+
+```bash
+poetry run pytest
+```
+
 ## TODO
 
 - [ ] Post-Training quantization

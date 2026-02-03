@@ -5,7 +5,7 @@ from torch import nn
 class DefaultNN(L.LightningModule):
     def __init__(self, criterion: nn.Module, in_channels: int = 1, out_channels: int = 10):
         super().__init__()
-        self.save_hyperparameters()
+        self.save_hyperparameters(ignore=['criterion'])
         self.criterion = criterion
         
         self.net = nn.Sequential(
