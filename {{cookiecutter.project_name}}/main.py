@@ -7,6 +7,8 @@ from lightning.pytorch.loggers import CometLogger
 from omegaconf import OmegaConf
 from datetime import datetime
 from dotenv import load_dotenv
+from src.utils.calibration import GeneralCalibrationDataReader
+from src.callbacks.export import ONNXExportCallback
 
 OmegaConf.register_new_resolver(
     "timestamp",
@@ -14,15 +16,27 @@ OmegaConf.register_new_resolver(
 )
 
 class CustomLightningCLI(LightningCLI):
-    def add_arguments_to_parser(self, parser):
-        parser.add_optimizer_args(torch.optim.Adam)
-        parser.add_lr_scheduler_args(torch.optim.lr_scheduler.ExponentialLR)
+    # def set_calibrarion_reader(self):
+    #     self.datamodule.setup(stage="validate")
+    #     val_loader = self.datamodule.val_dataloader()
         
+    #     calibration_reader = GeneralCalibrationDataReader(
+    #         data_loader=val_loader,
+    #         num_samples=100,
+    #         input_name="input"
+    #     )
+        
+    #     for callback in self.trainer.callbacks:
+    #         if isinstance(callback, ONNXExportCallback):
+    #             callback.calibration_data_reader = calibration_reader
+    #             if callback.verbose:
+    #                 print("✓ Calibration reader created from validation data")
+    #             break
+    
     def before_fit(self):
         config_file = getattr(self.config, "config", None)
         if isinstance(self.trainer.logger, CometLogger):
             if config_file and os.path.exists(config_file):
-                print('LOGGING CONFIG')
                 experiment = self.trainer.logger.experiment
                 experiment.log_asset(
                     config_file,

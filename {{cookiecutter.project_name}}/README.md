@@ -11,31 +11,51 @@ This project provides a flexible and easy-to-use set of tools for rapid model de
 
 **Corresponding Author:** {{cookiecutter.author_name}}
 
------
-
-## ✨ Key Features
-
-  * **Config-Driven:** Define your entire experiment—from data loading to model parameters—in a single `.yaml` file.
-  * **Training Pipelines:** Robust training, validation, and testing loops right out of the box.
-  * **📈 Experiment Tracking:** Automatic logging of metrics, parameters, and artifacts with [Comet ML](https://www.comet.com).
-  * **🌍 Energy Tracking:** Monitor energy consumption and CO2 emissions during training using [CodeCarbon](https://github.com/mlco2/codecarbon).
-
------
-
 ## 🚀 Getting Started
 
 ### 1\. Installation
 
-First, clone the repository and install the dependencies using poetry :
+
+#### Install pyenv
 
 ```bash
-git clone https://github.com/your-username/{{cookiecutter.project_name}}.git
-cd {{cookiecutter.project_name}}
+curl -fsSL https://pyenv.run | bash
+```
 
-# Install Poetry (if not already installed)
+Export variables in ```.bashrc```
+
+```bash
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init - bash)"
+```
+
+#### Install Poetry
+```bash
 curl -sSL https://install.python-poetry.org | python3 -
+```
+
+Export variables in ```.bashrc```
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+Verify installation:
+```bash
+poetry --version
+```
+
+#### Setup Project
+Once the prerequisites are installed, clone the repository and set up the environment:
+
+```bash
+git clone <repository-url>
+cd {{cookiecutter.project_name}}
+pyenv install 3.13
+pyenv virtualenv 3.13 {{cookiecutter.project_name}}
+pyenv activate {{cookiecutter.project_name}}
 poetry install
-poetry shell
 ```
 
 ### 2\. Configure Tracking
@@ -50,7 +70,21 @@ COMET_API_KEY=my_api_key
 COMET_WORKSPACE=my_workspace
 ```
 
-### 3. Run training, evaluation and testing
+### 3. Configure DVC
+
+In this project, DVC is enabled to track model versioning.
+To access the data, it should also be configured :
+
+```bash
+poetry run dvc init
+poetry run dvc remote add -d dvc_storage s3://mybucket/dvcstore
+poetry run dvc remote modify dvc_storage endpointurl http://localhost:9000
+poetry run dvc remote modify --local dvc_storage access_key_id ****
+poetry run dvc remote modify --local dvc_storage secret_access_key ****
+```
+
+
+### 4. Run training, evaluation and testing
 
 Running tasks follows the **PyTorch Lightning** workflow. Each task (training, evaluation, or testing) is fully configured via a YAML file and called with the Lightning CLI.
 
@@ -58,9 +92,24 @@ Running tasks follows the **PyTorch Lightning** workflow. Each task (training, e
 python main.py fit --config ./config/mnist.yaml
 ```
 
+or using DVC :
+
+```bash
+dvc repro
+```
+
 For more information about how to set the parameters for a task, please refer to the [**Lightning documentation**](https://lightning.ai/docs/pytorch/stable/cli/lightning_cli_advanced.html).
 
------
+### 5. Introducing new models
+
+When creating a new model as LightningModule, pytest will expect to see a ```example_input_array``` class variable that defines the expected input tensor (with batch dimension) for that model's forward pass.
+
+```python
+class DefaultNN(L.LightningModule):
+    def __init__(self, criterion: nn.Module, in_channels: int = 1, out_channels: int = 10):
+        super().__init__()
+        self.example_input_array = torch.randn((1, 1, 28, 28))
+```
 
 ## 📊 Tracking & Logging
 
@@ -77,36 +126,11 @@ Note that model saving is done by the ModelCheckpoint Callback to better work wi
 
 This template uses [CodeCarbon](https://github.com/mlco2/codecarbon) to track energy consumption and estimate carbon emissions. This is implemented via a lightning callback  `CodeCarbonCallback` in `./src/callbacks/codecarbon.py`:
 
-```python
-self.tracker = EmissionsTracker(
-    project_name=f"{self.project_name}",
-    save_to_file=save_to_file,
-    log_level=log_level,
-)
-```
-
-**How it works:**
-
-  * **Local CSV:** By default, metrics are saved locally to an `emissions.csv` file within your experiment's log directory. This file is also automatically uploaded to your Comet experiment's **Assets & Artifacts** tab.
-  * **Comet Integration:** The tracker also saves summary metrics (like `total_energy_kwh` and `total_co2_emissions`) in the **Others** tab of your Comet experiment.
-  * **Task-Specific Tracking:** It automatically tracks energy for two distinct tasks:
-      * `training`: Energy consumed during the main trainin/validation.
-      * `testing`: Energy consumed during the testing phase.
-
-> You can customize this behavior by creating a `.codecarbon.config` file in the project's root directory. See the [CodeCarbon documentation](https://mlco2.github.io/codecarbon/usage.html#configuration) for details.
+> You can customize codecarbon by creating a `.codecarbon.config` file in the project's root directory. See the [CodeCarbon documentation](https://mlco2.github.io/codecarbon/usage.html#configuration) for details.
 
 
 ## Tests
 
-To run tests : 
-
 ```bash
 poetry run pytest
 ```
-
-## TODO
-
-- [ ] Post-Training quantization
-- [ ] ONNX Export
-- [ ] TensorRT Export
-- [ ] Edit Readme with DVC model registration

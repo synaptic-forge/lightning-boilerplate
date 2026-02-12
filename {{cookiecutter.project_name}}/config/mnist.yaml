@@ -1,8 +1,8 @@
 seed_everything: true
-trainer:  
+trainer:
   max_epochs: 1
   precision: 32-true
-  callbacks: 
+  callbacks:
     - class_path: lightning.pytorch.callbacks.RichProgressBar
     - class_path: lightning.pytorch.callbacks.ModelCheckpoint
       dict_kwargs:
@@ -18,18 +18,27 @@ trainer:
         mode: min
     - class_path: src.callbacks.codecarbon.CodeCarbonCallback
       init_args:
-        project_name: "{{cookiecutter.project_name}}"
+        project_name: "kmc-model-qc"
         save_to_file: False
         log_level: error
         experiment_name: ${data.class_path}_${model.class_path}_${timestamp:%Y%m%d_%H%M%S}
+    - class_path: src.callbacks.export.ONNXExportCallback
+      dict_kwargs:
+        output_dir: ./logs
+        model_name: model
+        verbose: True
+    - class_path: src.callbacks.metrics.ExportMetricsCallback
+      dict_kwargs:
+        output_dir: ./logs
   logger:
     class_path: lightning.pytorch.loggers.CometLogger
     dict_kwargs:
       api_key: ${oc.env:COMET_API_KEY}
       workspace: ${oc.env:COMET_WORKSPACE}
-      project: "{{cookiecutter.project_name}}"
+      project: "kmc-model-qc"
       log_env_details: False
-      online: True
+      online: False
+      offline_directory: ./comet
       name: ${data.class_path}_${model.class_path}_${timestamp:%Y%m%d_%H%M%S}
 model:
   class_path: DefaultNN
@@ -46,7 +55,14 @@ data:
     data_dir: ./data
     batch_size: 32
     num_workers: 4
+
 optimizer:
-  lr: 0.001
+  class_path: torch.optim.AdamW
+  init_args:
+    lr: 0.0001 
+    weight_decay: 0.05
+
 lr_scheduler:
-  gamma: 0.1
+  class_path: torch.optim.lr_scheduler.ExponentialLR
+  init_args:
+    gamma: 0.1

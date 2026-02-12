@@ -1,5 +1,5 @@
 from lightning.pytorch.callbacks import Callback
-from codecarbon import EmissionsTracker
+from codecarbon import OfflineEmissionsTracker
 
 class CodeCarbonCallback(Callback):
     def __init__(self, project_name: str, experiment_name: str, save_to_file: bool = False, log_level: str = 'error'):
@@ -8,10 +8,12 @@ class CodeCarbonCallback(Callback):
         self.log_level = log_level
         self.experiment_name = experiment_name
         
-        self.tracker = EmissionsTracker(
+        self.tracker = OfflineEmissionsTracker(
             project_name=self.project_name,
             save_to_file=self.save_to_file,
             log_level=self.log_level,
+            country_iso_code="FRA",
+            tracking_mode="process",
             experiment_name=self.experiment_name
         )
 

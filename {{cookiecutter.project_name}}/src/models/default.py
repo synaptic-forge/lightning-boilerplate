@@ -1,5 +1,5 @@
 import lightning as L
-import torchmetrics
+import torchmetrics, torch
 from torch import nn
 
 class DefaultNN(L.LightningModule):
@@ -7,7 +7,7 @@ class DefaultNN(L.LightningModule):
         super().__init__()
         self.save_hyperparameters(ignore=['criterion'])
         self.criterion = criterion
-        
+        self.example_input_array = torch.randn((1, 1, 28, 28))
         self.net = nn.Sequential(
             nn.Conv2d(in_channels, 32, 3, 1),
             nn.ReLU(),
