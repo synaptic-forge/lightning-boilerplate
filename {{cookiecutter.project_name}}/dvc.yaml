@@ -4,8 +4,6 @@ stages:
     deps:
       - ./config/train_mnist.yaml
       - main.py
-    params:
-      - ./config/train_mnist.yaml
     outs:
       - ./logs/model.ckpt:
           cache: true
