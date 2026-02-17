@@ -89,7 +89,7 @@ poetry run dvc remote modify --local dvc_storage secret_access_key ****
 Running tasks follows the **PyTorch Lightning** workflow. Each task (training, evaluation, or testing) is fully configured via a YAML file and called with the Lightning CLI.
 
 ```bash
-python main.py fit --config ./config/mnist.yaml
+python main.py fit --config ./config/train.yaml
 ```
 
 or using DVC :

@@ -1,4 +1,4 @@
-import logging, warnings, torch, os
+import logging, warnings, os
 from src.models import *
 from src.datasets import *
 warnings.filterwarnings("ignore")
@@ -7,28 +7,24 @@ from lightning.pytorch.loggers import MLFlowLogger
 from omegaconf import OmegaConf
 from datetime import datetime
 from dotenv import load_dotenv
-from src.utils.calibration import GeneralCalibrationDataReader
-from src.callbacks.export import ONNXExportCallback
 
 OmegaConf.register_new_resolver(
     "timestamp",
     lambda fmt="%Y%m%d_%H%M%S": datetime.now().strftime(fmt),
 )
 
-class CustomLightningCLI(LightningCLI):
+class CustomLightningCLI(LightningCLI): 
     def before_fit(self):
-        config_file = getattr(self.config, "config", None)
         if isinstance(self.trainer.logger, MLFlowLogger):
-            if config_file and os.path.exists(config_file):
-                experiment = self.trainer.logger.experiment
-                experiment.log_artifact(
-                    run_id = self.trainer.logger.run_id,
-                    local_path=os.path.basename(config_file),
+            config_path = str(self.config.fit.config[0].abs_path)
+            if os.path.exists(config_path):
+                self.trainer.logger.experiment.log_artifact(
+                    self.trainer.logger.run_id,
+                    config_path,
+                    artifact_path="configs"
                 )
-                logging.info(f"✓ Logged config file to Comet: {config_file}")
 
 def cli_main():
-    
     if os.path.exists(".env"):
         load_dotenv(".env")
         logging.info("Loaded .env")

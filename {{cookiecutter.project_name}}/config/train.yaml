@@ -36,6 +36,7 @@ trainer:
       experiment_name: "{{cookiecutter.project_name}}"
       tracking_uri: ${oc.env:MLFLOW_TRACKING_URI}
       run_name: ${data.class_path}_${model.class_path}_${timestamp:%Y%m%d_%H%M%S}
+      save_dir: ./logs
 model:
   class_path: DefaultNN
   init_args:
