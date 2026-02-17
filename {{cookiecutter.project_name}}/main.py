@@ -3,7 +3,7 @@ from src.models import *
 from src.datasets import *
 warnings.filterwarnings("ignore")
 from lightning.pytorch.cli import LightningCLI
-from lightning.pytorch.loggers import CometLogger
+from lightning.pytorch.loggers import MLFlowLogger
 from omegaconf import OmegaConf
 from datetime import datetime
 from dotenv import load_dotenv
@@ -16,34 +16,16 @@ OmegaConf.register_new_resolver(
 )
 
 class CustomLightningCLI(LightningCLI):
-    # def set_calibrarion_reader(self):
-    #     self.datamodule.setup(stage="validate")
-    #     val_loader = self.datamodule.val_dataloader()
-        
-    #     calibration_reader = GeneralCalibrationDataReader(
-    #         data_loader=val_loader,
-    #         num_samples=100,
-    #         input_name="input"
-    #     )
-        
-    #     for callback in self.trainer.callbacks:
-    #         if isinstance(callback, ONNXExportCallback):
-    #             callback.calibration_data_reader = calibration_reader
-    #             if callback.verbose:
-    #                 print("✓ Calibration reader created from validation data")
-    #             break
-    
     def before_fit(self):
         config_file = getattr(self.config, "config", None)
-        if isinstance(self.trainer.logger, CometLogger):
+        if isinstance(self.trainer.logger, MLFlowLogger):
             if config_file and os.path.exists(config_file):
                 experiment = self.trainer.logger.experiment
-                experiment.log_asset(
-                    config_file,
-                    file_name=os.path.basename(config_file),
-                    overwrite=True,
+                experiment.log_artifact(
+                    run_id = self.trainer.logger.run_id,
+                    local_path=os.path.basename(config_file),
                 )
-                print(f"✓ Logged config file to Comet: {config_file}")
+                logging.info(f"✓ Logged config file to Comet: {config_file}")
 
 def cli_main():
     

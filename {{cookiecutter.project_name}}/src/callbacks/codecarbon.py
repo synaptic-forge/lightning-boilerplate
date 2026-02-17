@@ -23,8 +23,9 @@ class CodeCarbonCallback(Callback):
     def _stop_task(self, trainer, phase: str):
         emissions = self.tracker.stop_task(phase)
         if trainer.logger and hasattr(trainer.logger, "experiment"):
-            trainer.logger.experiment.log_metric(f"{phase}_energy", emissions.energy_consumed)
-            trainer.logger.experiment.log_metric(f"{phase}_emissions", emissions.emissions)
+            run_id = trainer.logger.run_id
+            trainer.logger.experiment.log_metric(run_id=run_id, key=f"{phase}_emissions", value=emissions.emissions)
+            trainer.logger.experiment.log_metric(run_id=run_id, key=f"{phase}_energy", value=emissions.energy_consumed)
         return emissions
 
     def on_fit_start(self, trainer, pl_module):

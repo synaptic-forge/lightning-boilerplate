@@ -18,7 +18,7 @@ trainer:
         mode: min
     - class_path: src.callbacks.codecarbon.CodeCarbonCallback
       init_args:
-        project_name: "kmc-model-qc"
+        project_name: "{{cookiecutter.project_name}}"
         save_to_file: False
         log_level: error
         experiment_name: ${data.class_path}_${model.class_path}_${timestamp:%Y%m%d_%H%M%S}
@@ -31,15 +31,11 @@ trainer:
       dict_kwargs:
         output_dir: ./logs
   logger:
-    class_path: lightning.pytorch.loggers.CometLogger
+    class_path: lightning.pytorch.loggers.MLFlowLogger
     dict_kwargs:
-      api_key: ${oc.env:COMET_API_KEY}
-      workspace: ${oc.env:COMET_WORKSPACE}
-      project: "kmc-model-qc"
-      log_env_details: False
-      online: False
-      offline_directory: ./comet
-      name: ${data.class_path}_${model.class_path}_${timestamp:%Y%m%d_%H%M%S}
+      experiment_name: "{{cookiecutter.project_name}}"
+      tracking_uri: ${oc.env:MLFLOW_TRACKING_URI}
+      run_name: ${data.class_path}_${model.class_path}_${timestamp:%Y%m%d_%H%M%S}
 model:
   class_path: DefaultNN
   init_args:

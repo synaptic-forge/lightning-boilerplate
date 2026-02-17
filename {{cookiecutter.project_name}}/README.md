@@ -113,14 +113,15 @@ class DefaultNN(L.LightningModule):
 
 ## 📊 Tracking & Logging
 
-### 📈 Experiment Tracking with CometML
+### 📈 Experiment Tracking with MLflow
 
-This template is fully integrated with [CometML](https://www.comet.com). When you provide valid env variables in your `.env` file, the framework will automatically:
+This template is fully integrated with MLflow, the open-source experiment tracking platform developed by Databricks. When you provide valid environment variables in your `.env` file (such as `MLFLOW_TRACKING_URI`, `MLFLOW_TRACKING_USERNAME` and `MLFLOW_TRACKING_PASSWORD`), the framework will automatically:
 
-  * Log all hyperparameters from your `.yaml` config.
-  * Track training, validation, and test metrics (e.g., loss, accuracy) in real-time.
+* Log all hyperparameters from your `.yaml` config.
+* Track training, validation, and test metrics (e.g., loss, accuracy, emissions, energy) in real time.
 
-Note that model saving is done by the ModelCheckpoint Callback to better work with a DVC integration.
+Model saving is handled by the `ModelCheckpoint` callback to ensure compatibility with DVC-based artifact versioning and reproducible pipelines.
+
 
 ### 🌍 Energy Consumption Tracking
 
