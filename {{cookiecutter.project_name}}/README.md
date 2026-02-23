@@ -2,7 +2,7 @@
 
 ![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)
 ![PyTorch Lightning](https://img.shields.io/badge/Lightning-792EE5?style=for-the-badge&logo=lightning&logoColor=white)
-![COmet](https://img.shields.io/badge/Comet-000000?style=for-the-badge&logo=comet&logoColor=white)
+![MLFlow](https://img.shields.io/badge/MLFlow-000000?style=for-the-badge&logo=mlflow&logoColor=white)
 ![CodeCarbon](https://img.shields.io/badge/CodeCarbon-00C853?style=for-the-badge&logo=leaflet&logoColor=white)
 
 
@@ -11,7 +11,7 @@ This project provides a flexible and easy-to-use set of tools for rapid model de
 
 **Corresponding Author:** {{cookiecutter.author_name}}
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1\. Installation
 
@@ -60,15 +60,12 @@ poetry install
 
 ### 2\. Configure Tracking
 
-This template uses **CometML** for experiment tracking. To enable it, create a `.env` file from the example and add your credentials:
+This template is fully integrated with MLflow, the open-source experiment tracking platform developed by Databricks. When you provide valid environment variables in your `.env` file (such as `MLFLOW_TRACKING_URI`, `MLFLOW_TRACKING_USERNAME` and `MLFLOW_TRACKING_PASSWORD`), the framework will automatically:
 
-```bash
-cp .env.example .env
-nano .env
+* Log all hyperparameters from your `.yaml` config.
+* Track training, validation, and test metrics (e.g., loss, accuracy, emissions, energy) in real time.
 
-COMET_API_KEY=my_api_key
-COMET_WORKSPACE=my_workspace
-```
+Model saving is handled by the `ModelCheckpoint` callback to ensure compatibility with DVC-based artifact versioning and reproducible pipelines.
 
 ### 3. Configure DVC
 
@@ -111,19 +108,7 @@ class DefaultNN(L.LightningModule):
         self.example_input_array = torch.randn((1, 1, 28, 28))
 ```
 
-## 📊 Tracking & Logging
-
-### 📈 Experiment Tracking with MLflow
-
-This template is fully integrated with MLflow, the open-source experiment tracking platform developed by Databricks. When you provide valid environment variables in your `.env` file (such as `MLFLOW_TRACKING_URI`, `MLFLOW_TRACKING_USERNAME` and `MLFLOW_TRACKING_PASSWORD`), the framework will automatically:
-
-* Log all hyperparameters from your `.yaml` config.
-* Track training, validation, and test metrics (e.g., loss, accuracy, emissions, energy) in real time.
-
-Model saving is handled by the `ModelCheckpoint` callback to ensure compatibility with DVC-based artifact versioning and reproducible pipelines.
-
-
-### 🌍 Energy Consumption Tracking
+## Energy Consumption Tracking
 
 This template uses [CodeCarbon](https://github.com/mlco2/codecarbon) to track energy consumption and estimate carbon emissions. This is implemented via a lightning callback  `CodeCarbonCallback` in `./src/callbacks/codecarbon.py`:
 
