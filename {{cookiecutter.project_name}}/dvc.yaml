@@ -1,8 +1,8 @@
 stages:
   train:
-    cmd: python main.py fit --config ./config/mnist.yaml
+    cmd: python main.py fit --config ./config/train.yaml
     deps:
-      - ./config/train_mnist.yaml
+      - ./config/train.yaml
       - main.py
     outs:
       - ./logs/model.ckpt:
@@ -17,9 +17,9 @@ stages:
           cache: true
           desc: "Lightning onnx param file"
   test:
-    cmd: python main.py test --config ./config/train_mnist.yaml --ckpt_path ./logs/model.ckpt
+    cmd: python main.py test --config ./config/train.yaml --ckpt_path ./logs/model.ckpt
     deps:
-      - ./config/train_mnist.yaml
+      - ./config/train.yaml
       - main.py
     outs:
       - ./logs/metrics.json:

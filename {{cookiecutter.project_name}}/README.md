@@ -73,7 +73,6 @@ In this project, DVC is enabled to track model versioning.
 To access the data, it should also be configured :
 
 ```bash
-poetry run dvc init
 poetry run dvc remote add -d dvc_storage s3://mybucket/dvcstore
 poetry run dvc remote modify dvc_storage endpointurl http://localhost:9000
 poetry run dvc remote modify --local dvc_storage access_key_id ****

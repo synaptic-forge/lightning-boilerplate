@@ -24,16 +24,7 @@ class CustomLightningCLI(LightningCLI):
                     artifact_path="configs"
                 )
 
-def cli_main():
-    if os.path.exists(".env"):
-        load_dotenv(".env")
-        logging.info("Loaded .env")
-    elif os.path.exists(".env.example"):
-        load_dotenv(".env.example")
-        logging.info("Loaded .env.example")
-    else:
-        logging.error("No .env or .env.example file found")
-        
+def cli_main():        
     project_name = "{{cookiecutter.project_name}}"
 
     logging.basicConfig(
@@ -48,4 +39,15 @@ def cli_main():
     )
 
 if __name__ == "__main__":
+    
+    if os.path.exists(".env"):
+        load_dotenv(".env")
+        logging.info("Loaded .env")
+    elif os.path.exists(".env.example"):
+        load_dotenv(".env.example")
+        logging.info("Loaded .env.example")
+    else:
+        logging.error("No .env or .env.example file found")
+        exit(1)
+        
     cli_main()
